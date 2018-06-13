@@ -11,9 +11,9 @@ import TweetView from './TweetView';
 
  class App extends Component {
   constructor(props) {
-    super(props); 
+    super(props);
     this.auth = new Authentication();
-    this.state = { 
+    this.state = {
         tweets: [],
         value: 0,
         max: 100,
@@ -50,8 +50,8 @@ import TweetView from './TweetView';
       value,
     });
   }
-  
-     // A filterState is an object where they keys are one of FREQUENCY, CELEBRITY, POPULARITY, CLOSENESS, SENTIMENT, 
+
+     // A filterState is an object where they keys are one of FREQUENCY, CELEBRITY, POPULARITY, CLOSENESS, SENTIMENT,
      // And the values are the numerical minumum values of the appropriate feature. Not all of the keys
      // must appear, but no keys other than the ones specifically allowed may appear.
   loadFilteredTweets(filterState) {
@@ -68,9 +68,13 @@ import TweetView from './TweetView';
       this.auth.logout();
       this.setState({username: undefined});
   }
-  
+
   isLoggedIn() {
       return this.auth.isAuthenticated();
+  }
+
+  login = () => {
+    fetch('/login/twitter');
   }
 
   render() {
@@ -92,7 +96,7 @@ import TweetView from './TweetView';
                       <p>{ this.state.username }</p>
                       <button type="button" onClick={this.logout.bind(this)}> Log me out! </button>
                     </span>
-                </span> 
+                </span>
                         :
                 <span className="Authentication">
                     <button type="button" onClick={this.authenticate.bind(this)}> Authenticate me! </button>
@@ -107,6 +111,8 @@ import TweetView from './TweetView';
             <button className="btn btn-primary brn-lg btn-block" type="button" onClick={this.authenticate.bind(this)}> Login with twitter </button>
              }
           </div>
+
+          <button className="btn btn-primary brn-lg btn-block" type="button" onClick={this.login}> Login with twitter </button>
 
           <div className="App-footer">
             <FilterControl dropdownClass={"Dropdown col-xs-2"} sliderClass={"Slider col-xs-9"} onChange={filterState => this.loadFilteredTweets(filterState)} tweets={ this.allTweets } />
