@@ -3,6 +3,7 @@
 var qs = require('querystring');
 var request = require('request');
 var Twitter = require('twitter');
+var passport = require( 'passport');
 
 var mongoose = require('mongoose'),
   Task = mongoose.model('Tasks');
@@ -43,56 +44,72 @@ exports.get_friends = function(req, res) {
   res.json(json);
 }
 
+
+exports.login = function(req,res){
+  console.log("twitter login");
+  return passport.authenticate('twitter')(req, res, next);
+}
+
+exports.callback = function(req,res){
+  console.log("twitter callback");
+  // console.log( "twitter callback:", process.env.NODE_ENV);
+  return passport.authenticate('twitter', {
+    successRedirect: "/",
+    failureRedirect: "/login"
+  })(req, res, next);
+}
+
+
 // GET /auth/twitter
-exports.authenticate = function(req, res) {
-    var oauth = { callback: 'http://127.0.0.1:3001'
-        , consumer_key: process.env.CONSUMER_KEY || 'eiVbxbQIfNYWCJJfXXwkSTflK'
-        , consumer_secret: process.env.CONSUMER_SECRET || '8zJtZZATHYxh2sh7uAXhJBufhtUfPfffqE6nI0IQXf7h577nbe'};
-    var url = 'https://api.twitter.com/oauth/request_token';
-    request.post({url:url, oauth:oauth}, function(e, r, body){
-        var req_data = qs.parse(body);
-        var redirect_uri = 'https://api.twitter.com/oauth/authenticate'
-                         + '?'
-                         + qs.stringify({oauth_token: req_data.oauth_token});
-        res.json({redirect_uri: redirect_uri});
-    });
-}
+// exports.authenticate = function(req, res) {
+//     var oauth = { callback: 'http://127.0.0.1:3001'
+//         , consumer_key: process.env.CONSUMER_KEY || 'eiVbxbQIfNYWCJJfXXwkSTflK'
+//         , consumer_secret: process.env.CONSUMER_SECRET || '8zJtZZATHYxh2sh7uAXhJBufhtUfPfffqE6nI0IQXf7h577nbe'};
+//     var url = 'https://api.twitter.com/oauth/request_token';
+//     request.post({url:url, oauth:oauth}, function(e, r, body){
+//         var req_data = qs.parse(body);
+//         var redirect_uri = 'https://api.twitter.com/oauth/authenticate'
+//                          + '?'
+//                          + qs.stringify({oauth_token: req_data.oauth_token});
+//         res.json({redirect_uri: redirect_uri});
+//     });
+// }
 
-// GET /auth/twitter/verify
-exports.verify = function(req, res) {
-    var oauth = { consumer_key: process.env.CONSUMER_KEY || 'eiVbxbQIfNYWCJJfXXwkSTflK'
-        , consumer_secret: process.env.CONSUMER_SECRET || '8zJtZZATHYxh2sh7uAXhJBufhtUfPfffqE6nI0IQXf7h577nbe'
-        , token: req.query.oauth_token
-        , verifier: req.query.oauth_verifier
-    };
-    var url = 'https://api.twitter.com/oauth/access_token'
-    request.post({url:url, oauth:oauth}, function(e, r, body){
-        var req_data = qs.parse(body);
-        if ('oauth_token_secret' in req_data) { // Only return json if got stuff from twitter
-            var client = new Twitter({
-              consumer_key: oauth.consumer_key,
-              consumer_secret: oauth.consumer_secret,
-              access_token_key: req_data.oauth_token,
-              access_token_secret: req_data.oauth_token_secret
-            });
+// // GET /auth/twitter/verify
+// exports.verify = function(req, res) {
+//     var oauth = { consumer_key: process.env.CONSUMER_KEY || 'eiVbxbQIfNYWCJJfXXwkSTflK'
+//         , consumer_secret: process.env.CONSUMER_SECRET || '8zJtZZATHYxh2sh7uAXhJBufhtUfPfffqE6nI0IQXf7h577nbe'
+//         , token: req.query.oauth_token
+//         , verifier: req.query.oauth_verifier
+//     };
+//     var url = 'https://api.twitter.com/oauth/access_token'
+//     request.post({url:url, oauth:oauth}, function(e, r, body){
+//         var req_data = qs.parse(body);
+//         if ('oauth_token_secret' in req_data) { // Only return json if got stuff from twitter
+//             var client = new Twitter({
+//               consumer_key: oauth.consumer_key,
+//               consumer_secret: oauth.consumer_secret,
+//               access_token_key: req_data.oauth_token,
+//               access_token_secret: req_data.oauth_token_secret
+//             });
 
-            get_all_data_cursor(client, 'friends/list', function(friends){
-                get_all_data_id(client, 'statuses/home_timeline', function(tweets){
-                    get_all_data_id(client, 'direct_messages', function(messages){
-                        push_to_database(req_data.user_id, friends, tweets, messages);
-                        get_profile_img(client, req_data.screen_name, req_data.user_id, function(profile_img){
-                            res.json({
-                                screen_name: req_data.screen_name,
-                                user_id: req_data.user_id,
-                                friends: friends,
-                                tweets: tweets,
-                                messages: messages,
-                                profile_img: profile_img
-                            });
-                        });
-                    });
-                });
-            });
-        }
-    });
-}
+//             get_all_data_cursor(client, 'friends/list', function(friends){
+//                 get_all_data_id(client, 'statuses/home_timeline', function(tweets){
+//                     get_all_data_id(client, 'direct_messages', function(messages){
+//                         push_to_database(req_data.user_id, friends, tweets, messages);
+//                         get_profile_img(client, req_data.screen_name, req_data.user_id, function(profile_img){
+//                             res.json({
+//                                 screen_name: req_data.screen_name,
+//                                 user_id: req_data.user_id,
+//                                 friends: friends,
+//                                 tweets: tweets,
+//                                 messages: messages,
+//                                 profile_img: profile_img
+//                             });
+//                         });
+//                     });
+//                 });
+//             });
+//         }
+//     });
+// }

@@ -12,11 +12,11 @@ module.exports = function(app) {
   app.route("/getTweets")
   .get(tweedStudy.get_tweets);
 
-  app.route("/auth/twitter")
-    .get(tweedStudy.authenticate);
+  // app.route("/auth/twitter")
+  // .get(tweedStudy.authenticate);
 
-  app.route("/auth/twitter/verify")
-    .get(tweedStudy.verify);
+  // app.route("/auth/twitter/verify")
+  // .get(tweedStudy.verify);
 
   app.route("/getFriends")
   .get(tweedStudy.get_friends);
@@ -26,4 +26,11 @@ module.exports = function(app) {
 
   app.route("/getUsers")
   .get(tweedStudy.get_users);
+
+  app.route("/login")
+  .get(tweedStudy.login);
+
+  app.route("/callback")
+  .get(tweedStudy.callback);
+
 };
