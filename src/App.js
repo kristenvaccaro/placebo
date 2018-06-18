@@ -73,10 +73,6 @@ import TweetView from './TweetView';
       return this.auth.isAuthenticated();
   }
 
-  login = () => {
-    fetch('/login/twitter');
-  }
-
   render() {
     return (
       <div className="App">
@@ -108,11 +104,9 @@ import TweetView from './TweetView';
              { this.isLoggedIn() ?
              this.state.tweets.map(r =>  <TweetView key={ r.id.toString() } tweet={ r } />)
              :
-            <button className="btn btn-primary brn-lg btn-block" type="button" onClick={this.authenticate.bind(this)}> Login with twitter </button>
+            <button className="btn btn-primary brn-lg btn-block" type="button" onClick={()=>fetch('/login/twitter')}> Login with twitter </button>
              }
           </div>
-
-          <button className="btn btn-primary brn-lg btn-block" type="button" onClick={this.login}> Login with twitter </button>
 
           <div className="App-footer">
             <FilterControl dropdownClass={"Dropdown col-xs-2"} sliderClass={"Slider col-xs-9"} onChange={filterState => this.loadFilteredTweets(filterState)} tweets={ this.allTweets } />

@@ -1,32 +1,14 @@
-//URI used to connect with mongo db
-var mongo_connection_uri =
-  "mongodb://tweed-study:uiuc2017@ds251245.mlab.com:51245/tweed-study";
-var mongodb = require("mongodb");
-var express = require("express"),
-  app = express(),
-  port = process.env.PORT || 3000,
-  mongoose = require("mongoose"),
-  Task = require("./api/models/model"), //created model loading here
-  bodyParser = require("body-parser");
-
+var express = require("express");
 var passport = require("passport");
 var Strategy = require("passport-twitter").Strategy;
 
-//mongoose.Promise = global.Promise;
-//mongoose.connect('mongodb://localhost/Tododb');
-
-// Middleware for parsing incoming HTTP requests and then passing it onto the server
-app.use(require('morgan')('combined'));
-app.use(require('cookie-parser')());
-app.use(require('body-parser').urlencoded({ extended: true }));
-app.use(require('express-session')({ secret: 'keyboard cat', resave: true, saveUninitialized: true }));
-app.use(bodyParser.json());
-
-var routes = require("./api/routes/route"); //importing route
-routes(app); //register the route
-
-app.listen(port);
-
+// Configure the Twitter strategy for use by Passport.
+//
+// OAuth 1.0-based strategies require a `verify` function which receives the
+// credentials (`token` and `tokenSecret`) for accessing the Twitter API on the
+// user's behalf, along with the user's profile.  The function must invoke `cb`
+// with a user object, which will be set at `req.user` in route handlers after
+// authentication.
 passport.use(
   new Strategy(
     {
@@ -42,11 +24,21 @@ passport.use(
       // be associated with a user record in the application's database, which
       // allows for account linking and authentication with other identity
       // providers.
+      console.log(profile);
       return cb(null, profile);
     }
   )
 );
 
+// Configure Passport authenticated session persistence.
+//
+// In order to restore authentication state across HTTP requests, Passport needs
+// to serialize users into and deserialize users out of the session.  In a
+// production-quality application, this would typically be as simple as
+// supplying the user ID when serializing, and querying the user record by ID
+// from the database when deserializing.  However, due to the fact that this
+// example does not have a database, the complete Twitter profile is serialized
+// and deserialized.
 passport.serializeUser(function(user, cb) {
   cb(null, user);
 });
@@ -55,52 +47,36 @@ passport.deserializeUser(function(obj, cb) {
   cb(null, obj);
 });
 
+// Create a new Express application.
+var app = express();
+
+// Use application-level middleware for common functionality, including
+// logging, parsing, and session handling.
+app.use(require("morgan")("combined"));
+app.use(require("cookie-parser")());
+app.use(require("body-parser").urlencoded({ extended: true }));
+app.use(
+  require("express-session")({
+    secret: "keyboard cat",
+    resave: true,
+    saveUninitialized: true
+  })
+);
+
+// Initialize Passport and restore authentication state, if any, from the
+// session.
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.get("/login/twitter",
-  passport.authenticate("twitter"));
+app.get("/login/twitter", passport.authenticate("twitter"));
 
 app.get(
   "/login/twitter/return",
   passport.authenticate("twitter", { failureRedirect: "/" }),
   function(req, res) {
-    console.log("Redirected");
+    console.log("GET /login/twitter/return")
     res.redirect("/");
   }
 );
 
-/*
- *TODO: Team #3
- *Task: Pull data from someone's feed and save it into an object and print out the complete response
- */
-console.log("P.U.R.E express server started on port " + port);
-
-/**
- The following code snippet establishes a connection with mongodb
- */
-mongodb.MongoClient.connect(
-  mongo_connection_uri,
-  function(err, database) {
-    if (err) {
-      console.log(err);
-      process.exit(1);
-    }
-    // Save database object from the callback for reuse.
-    var db = database;
-    console.log("Database connection ready");
-  }
-);
-
-/**
- The following code snippets establish the routes for MongoDB interaction
- */
-var friends_db = require("./src/db_routes/friends_db");
-var messages_db = require("./src/db_routes/messages_db");
-var tweets_db = require("./src/db_routes/tweets_db");
-var user_db = require("./src/db_routes/user_db");
-
-app.use("/db/users", user_db);
-app.use("/db/friends", friends_db);
-app.use("db/tweets", tweets_db);
-app.use("db/messages", messages_db);
+app.listen(3000);
