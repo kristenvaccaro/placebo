@@ -1,82 +1,140 @@
-var express = require("express");
-var passport = require("passport");
-var Strategy = require("passport-twitter").Strategy;
+'use strict';
 
-// Configure the Twitter strategy for use by Passport.
-//
-// OAuth 1.0-based strategies require a `verify` function which receives the
-// credentials (`token` and `tokenSecret`) for accessing the Twitter API on the
-// user's behalf, along with the user's profile.  The function must invoke `cb`
-// with a user object, which will be set at `req.user` in route handlers after
-// authentication.
-passport.use(
-  new Strategy(
-    {
-      consumerKey: process.env.CONSUMER_KEY || "eiVbxbQIfNYWCJJfXXwkSTflK",
-      consumerSecret:
-        process.env.CONSUMER_SECRET ||
-        "8zJtZZATHYxh2sh7uAXhJBufhtUfPfffqE6nI0IQXf7h577nbe",
-      callbackURL: "http://127.0.0.1:3000/login/twitter/return"
-    },
-    function(token, tokenSecret, profile, cb) {
-      // In this example, the user's Twitter profile is supplied as the user
-      // record.  In a production-quality application, the Twitter profile should
-      // be associated with a user record in the application's database, which
-      // allows for account linking and authentication with other identity
-      // providers.
-      console.log(profile);
-      return cb(null, profile);
-    }
-  )
-);
+//mongoose file must be loaded before all other files in order to provide
+// models to other modules
+var passport = require('passport'),
+  express = require('express'),
+  jwt = require('jsonwebtoken'),
+  expressJwt = require('express-jwt'),
+  router = express.Router(),
+  cors = require('cors'),
+  bodyParser = require('body-parser'),
+  request = require('request'),
+  twitterConfig = require('./twitter.config.js');
 
-// Configure Passport authenticated session persistence.
-//
-// In order to restore authentication state across HTTP requests, Passport needs
-// to serialize users into and deserialize users out of the session.  In a
-// production-quality application, this would typically be as simple as
-// supplying the user ID when serializing, and querying the user record by ID
-// from the database when deserializing.  However, due to the fact that this
-// example does not have a database, the complete Twitter profile is serialized
-// and deserialized.
-passport.serializeUser(function(user, cb) {
-  cb(null, user);
-});
+var passportConfig = require('./passport');
 
-passport.deserializeUser(function(obj, cb) {
-  cb(null, obj);
-});
+//setup configuration for facebook login
+passportConfig();
 
-// Create a new Express application.
 var app = express();
 
-// Use application-level middleware for common functionality, including
-// logging, parsing, and session handling.
-app.use(require("morgan")("combined"));
-app.use(require("cookie-parser")());
-app.use(require("body-parser").urlencoded({ extended: true }));
-app.use(
-  require("express-session")({
-    secret: "keyboard cat",
-    resave: true,
-    saveUninitialized: true
-  })
-);
+// enable cors
+var corsOption = {
+  origin: true,
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+  exposedHeaders: ['x-auth-token']
+};
+app.use(cors(corsOption));
 
-// Initialize Passport and restore authentication state, if any, from the
-// session.
-app.use(passport.initialize());
-app.use(passport.session());
+//rest API requirements
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
+app.use(bodyParser.json());
 
-app.get("/login/twitter", passport.authenticate("twitter"));
+router.route('/health-check').get(function(req, res) {
+  res.status(200);
+  res.send('Hello World');
+});
 
-app.get(
-  "/login/twitter/return",
-  passport.authenticate("twitter", { failureRedirect: "/" }),
-  function(req, res) {
-    console.log("GET /login/twitter/return")
-    res.redirect("/");
+var createToken = function(auth) {
+  return jwt.sign({
+    id: auth.id
+  }, 'my-secret',
+  {
+    expiresIn: 60 * 120
+  });
+};
+
+var generateToken = function (req, res, next) {
+  req.token = createToken(req.auth);
+  return next();
+};
+
+var sendToken = function (req, res) {
+  res.setHeader('x-auth-token', req.token);
+  return res.status(200).send(JSON.stringify(req.user));
+};
+
+router.route('/auth/twitter/callback')
+  .post(function(req, res) {
+    console.log('POST /auth/twitter/callback')
+    request.post({
+      url: 'https://api.twitter.com/oauth/request_token',
+      oauth: {
+        oauth_callback: "http%3A%2F%2Flocalhost%3A3000%2Ftwitter-callback",
+        consumer_key: twitterConfig.consumerKey,
+        consumer_secret: twitterConfig.consumerSecret
+      }
+    }, function (err, r, body) {
+      if (err) {
+        console.log(err);
+        return res.send(500, { message: e.message });
+      }
+      console.log(body);
+
+      var jsonStr = '{ "' + body.replace(/&/g, '", "').replace(/=/g, '": "') + '"}';
+      res.send(JSON.parse(jsonStr));
+    });
+  });
+
+router.route('/auth/twitter')
+  .post((req, res, next) => {
+    console.log('POST /auth/twitter')
+    request.post({
+      url: `https://api.twitter.com/oauth/access_token?oauth_verifier`,
+      oauth: {
+        consumer_key: twitterConfig.consumerKey,
+        consumer_secret: twitterConfig.consumerSecret,
+        token: req.query.oauth_token
+      },
+      form: { oauth_verifier: req.query.oauth_verifier }
+    }, function (err, r, body) {
+      if (err) {
+        console.log(err);
+        return res.send(500, { message: err.message });
+      }
+      console.log(body);
+      const bodyString = '{ "' + body.replace(/&/g, '", "').replace(/=/g, '": "') + '"}';
+      const parsedBody = JSON.parse(bodyString);
+
+      req.body['oauth_token'] = parsedBody.oauth_token;
+      req.body['oauth_token_secret'] = parsedBody.oauth_token_secret;
+      req.body['user_id'] = parsedBody.user_id;
+
+      next();
+    });
+  }, passport.authenticate('twitter-token', {session: false}), function(req, res, next) {
+      if (!req.user) {
+        return res.send(401, 'User Not Authenticated');
+      }
+      console.log(res);
+
+      // prepare token for API
+      req.auth = {
+        id: req.user.id
+      };
+
+      return next();
+    }, generateToken, sendToken);
+
+//token handling middleware
+var authenticate = expressJwt({
+  secret: 'my-secret',
+  requestProperty: 'auth',
+  getToken: function(req) {
+    if (req.headers['x-auth-token']) {
+      return req.headers['x-auth-token'];
+    }
+    return null;
   }
-);
+});
+
+app.use('/api/v1', router);
 
 app.listen(3000);
+module.exports = app;
+
+console.log('Server running at http://localhost:3000/');
