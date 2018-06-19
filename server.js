@@ -14,7 +14,7 @@ var passport = require("passport"),
 
 var passportConfig = require("./passport");
 
-//setup configuration for facebook login
+//setup configuration for twitter login
 passportConfig();
 
 var app = express();
@@ -63,8 +63,8 @@ var sendToken = function(req, res) {
   return res.status(200).send(JSON.stringify(req.user));
 };
 
-router.route("/auth/twitter/callback").post(function(req, res) {
-  console.log("POST /auth/twitter/callback");
+router.route("/auth/twitter/reverse").post(function(req, res) {
+  console.log("POST /auth/twitter/reverse");
   request.post(
     {
       url: "https://api.twitter.com/oauth/request_token",
@@ -76,10 +76,10 @@ router.route("/auth/twitter/callback").post(function(req, res) {
     },
     function(err, r, body) {
       if (err) {
+        console.log("Error: POST /auth/twitter/reverse");
         console.log(err);
         return res.send(500, { message: err.message });
       }
-      console.log(body);
 
       var jsonStr =
         '{ "' + body.replace(/&/g, '", "').replace(/=/g, '": "') + '"}';
@@ -88,25 +88,25 @@ router.route("/auth/twitter/callback").post(function(req, res) {
   );
 });
 
-router.route("/auth/twitter").post(
+router.route("/auth/twitter/callback").get(
   (req, res, next) => {
-    console.log("POST /auth/twitter");
+    console.log("GET /auth/twitter/callback");
     request.post(
       {
-        url: `https://api.twitter.com/oauth/access_token?oauth_verifier`,
+        url: `https://api.twitter.com/oauth/access_token`,
         oauth: {
           consumer_key: twitterConfig.consumerKey,
           consumer_secret: twitterConfig.consumerSecret,
-          token: req.query.oauth_token
-        },
-        form: { oauth_verifier: req.query.oauth_verifier }
+          token: req.query.oauth_token,
+          verifier: req.query.oauth_verifier
+        }
       },
       function(err, r, body) {
         if (err) {
+          console.log("Error: POST /auth/twitter/callback");
           console.log(err);
           return res.send(500, { message: err.message });
         }
-        console.log(body);
         const bodyString =
           '{ "' + body.replace(/&/g, '", "').replace(/=/g, '": "') + '"}';
         const parsedBody = JSON.parse(bodyString);
@@ -119,12 +119,12 @@ router.route("/auth/twitter").post(
       }
     );
   },
-  passport.authenticate("twitter-token", { session: false }),
+  passport.authenticate("twitter-token"),
   function(req, res, next) {
+    console.log(req);
     if (!req.user) {
       return res.send(401, "User Not Authenticated");
     }
-    console.log(res);
 
     // prepare token for API
     req.auth = {

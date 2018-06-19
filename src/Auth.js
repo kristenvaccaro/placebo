@@ -41,7 +41,7 @@ class Auth extends Component {
         loginUrl="http://localhost:3000/auth/twitter"
         onFailure={this.onFailed}
         onSuccess={this.onSuccess}
-        requestTokenUrl="http://localhost:3000/auth/twitter/callback"
+        requestTokenUrl="http://localhost:3000/auth/twitter/reverse"
       />
     );
 

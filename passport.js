@@ -9,12 +9,11 @@ module.exports = function() {
     new TwitterTokenStrategy(
       {
         consumerKey: twitterConfig.consumerKey,
-        consumerSecret: twitterConfig.consumerSecret,
-        includeEmail: true
+        consumerSecret: twitterConfig.consumerSecret
       },
       function(token, tokenSecret, profile, done) {
-        console.log(profile);
-        done();
+        console.log("Passport")
+        return done(profile);
       }
     )
   );
