@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import TwitterLogin from 'react-twitter-auth';
+import TwitterLogin from "react-twitter-auth";
 
-class Auth extends Component {
+class App extends Component {
   constructor() {
     super();
 
@@ -12,6 +12,7 @@ class Auth extends Component {
     const token = response.headers.get("x-auth-token");
     response.json().then(user => {
       if (token) {
+        console.log(user);
         this.setState({ isAuthenticated: true, user: user, token: token });
       }
     });
@@ -28,25 +29,22 @@ class Auth extends Component {
   render() {
     let content = !!this.state.isAuthenticated ? (
       <div>
-        <p>Authenticated</p>
-        <div>{this.state.user.email}</div>
-        <div>
-          <button onClick={this.logout} className="button">
-            Log out
-          </button>
-        </div>
+        {this.state.user.username}
+        <button onClick={this.logout} className="button">
+          Log out
+        </button>
       </div>
     ) : (
       <TwitterLogin
-        loginUrl="http://localhost:3000/auth/twitter"
+        loginUrl="http://localhost:3000/api/v1/auth/twitter"
         onFailure={this.onFailed}
         onSuccess={this.onSuccess}
-        requestTokenUrl="http://localhost:3000/auth/twitter/reverse"
+        requestTokenUrl="http://localhost:3000/api/v1/auth/twitter/reverse"
       />
     );
 
-    return <div>{content}</div>;
+    return <div className="App">{content}</div>;
   }
 }
 
-export default Auth;
+export default App;

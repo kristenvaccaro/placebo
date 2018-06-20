@@ -13,7 +13,7 @@ module.exports = function() {
       },
       function(token, tokenSecret, profile, done) {
         console.log("Passport")
-        return done(profile);
+        return done(null, profile);
       }
     )
   );
