@@ -5,15 +5,14 @@ class App extends Component {
   constructor() {
     super();
 
-    this.state = { isAuthenticated: false, user: null, token: "" };
+    this.state = { isAuthenticated: false, user: null, tweets: [], token: "" };
   }
 
   onSuccess = response => {
     const token = response.headers.get("x-auth-token");
-    response.json().then(user => {
+    response.json().then(data => {
       if (token) {
-        console.log(user);
-        this.setState({ isAuthenticated: true, user: user, token: token });
+        this.setState({ isAuthenticated: true, user: data.user, tweets: data.tweets, token: token });
       }
     });
   };
@@ -40,6 +39,7 @@ class App extends Component {
         onFailure={this.onFailed}
         onSuccess={this.onSuccess}
         requestTokenUrl="http://localhost:3000/api/v1/auth/twitter/reverse"
+        showIcon={false}
       />
     );
 

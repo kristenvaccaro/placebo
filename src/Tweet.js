@@ -41,13 +41,13 @@ class Tweet {
         return this.retweet_count;
     }
 
-    getWordSentiment(word) { 
+    getWordSentiment(word) {
         if(wordsHash.has(word))
             return wordsHash.get(word);
 
         for(let i = 0; i < happyWildcardWords.length; i++) {
             let happy = happyWildcardWords[i];
-            if(word.startsWith(happy.substring(0, happy.length - 1))) 
+            if(word.startsWith(happy.substring(0, happy.length - 1)))
             {
                 wordSentiments[word] = 1;
                 return 1;
@@ -56,7 +56,7 @@ class Tweet {
 
         for(let i = 0; i < sadWildcardWords.length; i++) {
             let sad = sadWildcardWords[i];
-            if(word.startsWith(sad.substring(0, sad.length - 1))) 
+            if(word.startsWith(sad.substring(0, sad.length - 1)))
             {
                 wordSentiments[word] = -1;
                 return -1;
@@ -89,7 +89,7 @@ class Tweet {
             else if(this.user.followers_count > 10000)
                 celeb += 2;
             else if(this.user.followers_count > 1000)
-                celeb += 1; 
+                celeb += 1;
             else
                 celeb -= 1;
             this.celebrity = celeb;
@@ -123,64 +123,64 @@ class Tweet {
         // No one has to know I've done this
         const messages = App.messages;
 
-        if(messages.length === 0)
-            return 0;
+        if (messages && messages.length > 0){
+          let out = 0;
+          if(user.followers_count > 100000)
+              out -= 3;
+          else if(user.followers_count > 10000)
+              out -= 2;
+          else if(user.followers_count > 1000)
+              out -= 1;
+          else
+              out += 1;
 
-        let out = 0;
-        if(user.followers_count > 100000)
-            out -= 3;
-        else if(user.followers_count > 10000)
-            out -= 2;
-        else if(user.followers_count > 1000)
-            out -= 1;
-        else
-            out += 1;
+          let words = messages.map(message => message
+              .text.replace(/[^\w\s]/g, "")
+              .split(" "))
+              .reduce((x, y) => x.concat(y), []);
+          let wordCount = words.length;
+          if(wordCount > 1000)
+              out += 10;
+          else if(wordCount > 100)
+              out =+ 5;
+          else if(wordCount > 10)
+              out += 2;
+          else if(wordCount > 0)
+              out += 1;
 
-        let words = messages.map(message => message
-            .text.replace(/[^\w\s]/g, "")
-            .split(" "))
-            .reduce((x, y) => x.concat(y), []);
-        let wordCount = words.length;
-        if(wordCount > 1000)
-            out += 10;
-        else if(wordCount > 100)
-            out =+ 5;
-        else if(wordCount > 10)
-            out += 2;
-        else if(wordCount > 0)
-            out += 1;
+          let averageSentiment = words
+              .map(this.getWordSentiment.bind(this)).reduce((x, y) => x + y) / wordCount;
+          if(averageSentiment > 0)
+              out += 1;
+          else
+              out -= 1;
 
-        let averageSentiment = words
-            .map(this.getWordSentiment.bind(this)).reduce((x, y) => x + y) / wordCount;
-        if(averageSentiment > 0)
-            out += 1;
-        else 
-            out -= 1;
+          let mostRecentMessage = messages
+              .reduce((x, y) => new Date(x.created_at) > new Date(y.created_at) ? x : y);
+          let timeAgo = new Date() - new Date(mostRecentMessage.created_at);
+          const MILLIS_IN_HOUR = 60*1000;
+          let hoursAgo = timeAgo / MILLIS_IN_HOUR;
 
-        let mostRecentMessage = messages
-            .reduce((x, y) => new Date(x.created_at) > new Date(y.created_at) ? x : y);
-        let timeAgo = new Date() - new Date(mostRecentMessage.created_at);
-        const MILLIS_IN_HOUR = 60*1000;
-        let hoursAgo = timeAgo / MILLIS_IN_HOUR;
+          const HOURS_IN_DAY = 24;
+          const HOURS_IN_WEEK = HOURS_IN_DAY * 7;
+          const HOURS_IN_MONTH = HOURS_IN_DAY * 30;
+          if(hoursAgo < 6)
+              out += 10;
+          else if(hoursAgo < HOURS_IN_DAY)
+              out += 5;
+          else if(hoursAgo < HOURS_IN_WEEK)
+              out += 2;
+          else if(hoursAgo < HOURS_IN_MONTH)
+              out += 1;
 
-        const HOURS_IN_DAY = 24;
-        const HOURS_IN_WEEK = HOURS_IN_DAY * 7;
-        const HOURS_IN_MONTH = HOURS_IN_DAY * 30;
-        if(hoursAgo < 6)
-            out += 10;
-        else if(hoursAgo < HOURS_IN_DAY)
-            out += 5;
-        else if(hoursAgo < HOURS_IN_WEEK)
-            out += 2;
-        else if(hoursAgo < HOURS_IN_MONTH)
-            out += 1;
+          if(user.verified)
+              out -= 1;
+          else
+              out += 1;
 
-        if(user.verified)
-            out -= 1;
-        else
-            out += 1;
-
-        return out;
+          return out;
+        }
+        return 0;
     }
 
     getText() {
