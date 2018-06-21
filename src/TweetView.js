@@ -11,15 +11,15 @@ export default class TweetView extends Component {
         let time_difference = <Moment fromNow>{created_at}</Moment>
         let retweet_status = null;
         if (tweet.hasOwnProperty('retweeted_status')){
-            retweet_status = <p className="col-xs-offset-2 col-xs-10"> 
+            retweet_status = <p className="col-xs-offset-2 col-xs-10">
                 <span className="glyphicon glyphicon-retweet" aria-hidden="true"></span>
                 { tweet.user.screen_name } retweeted </p>;
         }
 
         let media = null;
         if (tweet.entities.media) {
-            media = <img id="media-img" className="img-responsive img-rounded" 
-            width={tweet.entities.media[0].sizes.thumb.w * 5} 
+            media = <img id="media-img" className="img-responsive img-rounded"
+            width={tweet.entities.media[0].sizes.thumb.w * 5}
             src={tweet.entities.media[0].media_url} alt=""/>;
         }
 
