@@ -9,7 +9,10 @@ import "./App.css";
 import FilterControl from "./FilterControl.js";
 import TweetView from "./TweetView";
 
+
 import TwitterLogin from "react-twitter-auth";
+
+var shuffle = require('shuffle-array');
 
 class App extends Component {
   constructor(props) {
@@ -52,6 +55,14 @@ class App extends Component {
       if (token) {
         this.setState({ isAuthenticated: true, user: data.user, token: token });
         this.allTweets = data.tweets.map(t => new Tweet(t));
+
+        var allPopularityValues = this.allTweets.map((tweet, i) => tweet.retweet_count );
+        shuffle(allPopularityValues);
+
+        this.allTweets.forEach(tweet => tweet.random_retweet_count = allPopularityValues.pop() );
+
+        console.log(this.allTweets);
+
         this.filterer = new TweetFilterer(this.allTweets);
         this.setState({ tweets: this.allTweets });
       }
