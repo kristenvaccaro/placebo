@@ -8,6 +8,8 @@ import TweetView from "./TweetView";
 
 import TwitterLogin from "react-twitter-auth";
 
+var shuffle = require('shuffle-array');
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -75,6 +77,12 @@ class App extends Component {
 
         this.setState({ isAuthenticated: true, user: data.user, token: token });
         let allTweets = data.tweets.map(t => new Tweet(t));
+
+        var allPopularityValues = allTweets.map((tweet, i) => tweet.retweet_count );
+        shuffle(allPopularityValues);
+        allTweets.forEach(tweet => tweet.random_retweet_count = allPopularityValues.pop() );
+        console.log(allTweets);
+
         this.filterer = new TweetFilterer(allTweets);
         this.setState({ tweets: allTweets });
       }

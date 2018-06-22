@@ -24,6 +24,7 @@ class Tweet {
         if(jsonObj.retweeted_status !== undefined)
             this.retweeted_status = jsonObj.retweeted_status;
         this.retweet_count = jsonObj.retweet_count;
+        this.random_retweet_count = 0;
         this.favorited = jsonObj.favorited;
         this.favorite_count = jsonObj.favorite_count;
         this.display_text_range = jsonObj.display_text_range;
