@@ -23,6 +23,7 @@ class App extends Component {
     };
 
     this.filterer = new TweetFilterer([]);
+    this.allTweets = [];
   }
 
   componentDidMount() {
@@ -37,12 +38,12 @@ class App extends Component {
         if (seconds <= 60 * 60 * 24) {
           const USER = JSON.parse(localStorage.getItem("user"));
           const TWEETS = JSON.parse(localStorage.getItem("tweets"));
-          let allTweets = TWEETS.map(t => new Tweet(t));
-          this.filterer = new TweetFilterer(allTweets);
+          this.allTweets = TWEETS.map(t => new Tweet(t));
+          this.filterer = new TweetFilterer(this.allTweets);
           this.setState({
             isAuthenticated: true,
             user: USER,
-            tweets: allTweets
+            tweets: this.allTweets
           });
         }
       }
@@ -135,9 +136,9 @@ class App extends Component {
         <div className="App-footer fixed-bottom w-100 bg-dark">
           <FilterControl
             dropdownClass={"Dropdown col-xs-2 ml-2"}
-            sliderClass={"Slider col align-middle mt-4 mr-5"}
+            sliderClass={"Slider col mt-4 mr-5"}
             onChange={filterState => this.loadFilteredTweets(filterState)}
-            tweets={this.state.tweets}
+            tweets={this.allTweets}
           />
         </div>
       </div>
