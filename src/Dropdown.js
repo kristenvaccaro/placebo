@@ -16,7 +16,7 @@ export default class FeatureDropdown extends React.Component {
     constructor(props) {
         super(props);
         this.state = {value: props.value};
-        this.options = [POPULARITY, FREQUENCY, SENTIMENT, CLOSENESS, CELEBRITY];
+        this.options = [POPULARITY, FREQUENCY];
     }
 
     handleChange = (event, index, value) => {

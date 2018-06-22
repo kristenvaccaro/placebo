@@ -1,11 +1,9 @@
 import React, { Component } from "react";
+
 import Tweet from "./Tweet.js";
 import logo from "./Twitter_Logo_WhiteOnBlue.svg";
-import Authentication from "./Authentication/Authentication.js";
 import "./App.css";
-import "./Authentication/Authentication";
 import TweetFilterer from "./TweetFilterer.js";
-import "./App.css";
 import FilterControl from "./FilterControl.js";
 import TweetView from "./TweetView";
 
@@ -14,7 +12,6 @@ import TwitterLogin from "react-twitter-auth";
 class App extends Component {
   constructor(props) {
     super(props);
-    this.auth = new Authentication();
     this.state = {
       value: 0,
       max: 100,
@@ -27,8 +24,30 @@ class App extends Component {
     };
 
     this.filterer = new TweetFilterer([]);
-    this.allTweets = [];
-    this.messages = [];
+  }
+
+  componentDidMount() {
+    if (typeof Storage !== undefined) {
+      const cacheHits = localStorage.getItem("time");
+      console.log(cacheHits)
+      if (cacheHits) {
+        let last = new Date(cacheHits);
+        let curr = new Date();
+        var seconds = (curr.getTime() - last.getTime()) / 1000;
+        // use stored data in one day
+        if (seconds <= 60 * 60 * 24) {
+          const USER = JSON.parse(localStorage.getItem("user"));
+          const TWEETS = JSON.parse(localStorage.getItem("tweets"));
+          let allTweets = TWEETS.map(t => new Tweet(t));
+          this.filterer = new TweetFilterer(allTweets);
+          this.setState({
+            isAuthenticated: true,
+            user: USER,
+            tweets: allTweets
+          });
+        }
+      }
+    }
   }
 
   onSliderChange(value) {
@@ -50,10 +69,14 @@ class App extends Component {
     const token = response.headers.get("x-auth-token");
     response.json().then(data => {
       if (token) {
+        localStorage.setItem("user", JSON.stringify(data.user));
+        localStorage.setItem("tweets", JSON.stringify(data.tweets));
+        localStorage.setItem("time", Date());
+
         this.setState({ isAuthenticated: true, user: data.user, token: token });
-        this.allTweets = data.tweets.map(t => new Tweet(t));
-        this.filterer = new TweetFilterer(this.allTweets);
-        this.setState({ tweets: this.allTweets });
+        let allTweets = data.tweets.map(t => new Tweet(t));
+        this.filterer = new TweetFilterer(allTweets);
+        this.setState({ tweets: allTweets });
       }
     });
   };
@@ -64,16 +87,18 @@ class App extends Component {
 
   logout = () => {
     this.setState({ isAuthenticated: false, token: "", user: null });
+    localStorage.clear();
   };
 
   render() {
     let auth = this.state.isAuthenticated ? (
-      <div>
-        <img src={this.state.user.photos[0].value} alt="profile"/>
-        <button onClick={this.logout} className="button">
+      <span className="d-flex">
+        <span className=".d-none .d-md-block navbar-text mr-2">{this.state.user.username}</span>
+        <img className="rounded mr-1" src={this.state.user.photos[0].value} alt="profile" />
+        <button onClick={this.logout} className="btn btn-outline-light mr-1" type="button">
           Log out
         </button>
-      </div>
+      </span>
     ) : (
       <TwitterLogin
         loginUrl="http://localhost:3000/api/v1/auth/twitter"
@@ -81,23 +106,21 @@ class App extends Component {
         onSuccess={this.onSuccess}
         requestTokenUrl="http://localhost:3000/api/v1/auth/twitter/reverse"
         showIcon={false}
+        className="my-2 my-sm-0 btn btn-primary"
       />
     );
     return (
-      <div className="App">
-        <div className="App-header">
-          <span className="Title-area col-xs-8 col-sm-5">
-            <img src={logo} className="App-logo" alt="logo" />
-            <h1 className="Title">Twitter Study</h1>
-          </span>
-          <span className="Authentication-area col-xs-4 col-sm-3">{auth}</span>
-        </div>
+      <div className="App container-fluid">
+        <nav className="navbar navbar-dark App-header">
+          <span className="navbar-brand mb-0 h1">Twitter Study</span>
+          {auth}
+        </nav>
 
-        <div className="Tweet-list">
+        <div className="Tweet-list ml-xs-1 ml-md-5 mt-2">
           {this.state.isAuthenticated &&
-            this.state.tweets.map(r =>
-              (<TweetView key={r.id.toString()} tweet={r} />)
-            )}
+            this.state.tweets.map(r => (
+              <TweetView key={r.id.toString()} tweet={r} />
+            ))}
         </div>
 
         <div className="App-footer">
