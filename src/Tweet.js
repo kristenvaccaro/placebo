@@ -32,6 +32,7 @@ class Tweet {
 
         // Calculate stuff...
         this.getPopularity();
+        this.getPopularityRandom();
         this.getSentiment();
         this.getCloseness()
         this.getFrequency();
@@ -40,6 +41,10 @@ class Tweet {
 
     getPopularity() {
         return this.retweet_count;
+    }
+
+    getPopularityRandom() {
+        return this.random_retweet_count;
     }
 
     getWordSentiment(word) {

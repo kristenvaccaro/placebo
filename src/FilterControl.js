@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import FeatureDropdown from './Dropdown.js'
 import Slider  from 'rc-slider';
-import { FREQUENCY, CELEBRITY, POPULARITY, CLOSENESS, SENTIMENT } from './TweetFilterer';
+import { FREQUENCY, CELEBRITY, POPULARITY, POPULARITYRANDOM, CLOSENESS, SENTIMENT } from './TweetFilterer';
 
 export default class FilterControl extends Component {
     constructor(props) {
@@ -12,7 +12,7 @@ export default class FilterControl extends Component {
         // but we can't ask the tweets because it takes forever and also
         // we don't have them on construction. So, we have this.
         // Don't tell anyone.
-        [FREQUENCY, CELEBRITY, POPULARITY, CLOSENESS, SENTIMENT]
+        [FREQUENCY, CELEBRITY, POPULARITY, POPULARITYRANDOM, CLOSENESS, SENTIMENT]
             .forEach(feature => filterStatus[feature] = LOW_NUMBER);
 
         let currentFeature = POPULARITY;
@@ -36,6 +36,13 @@ export default class FilterControl extends Component {
         return Math.max(...tweets.map(t => t.getPopularity()));
     }
     getLowestPop(tweets) {
+        return Math.min(...tweets.map(t => t.getPopularity()));
+    }
+
+    getHighestPopRandom(tweets) {
+        return Math.max(...tweets.map(t => t.getPopularity()));
+    }
+    getLowestPopRandom(tweets) {
         return Math.min(...tweets.map(t => t.getPopularity()));
     }
 
@@ -92,6 +99,9 @@ export default class FilterControl extends Component {
             case POPULARITY:
                 highest = this.getHighestPop(this.props.tweets);
                 break;
+            case POPULARITYRANDOM:
+                highest = this.getHighestPopRandom(this.props.tweets);
+                break;
             case SENTIMENT:
                 highest = this.getHighestSentiment(this.props.tweets);
                 break;
@@ -120,6 +130,9 @@ export default class FilterControl extends Component {
                 break;
             case POPULARITY:
                 lowest = this.getLowestPop(this.props.tweets);
+                break;
+            case POPULARITYRANDOM:
+                lowest = this.getLowestPopRandom(this.props.tweets);
                 break;
             case SENTIMENT:
                 lowest = this.getLowestSentiment(this.props.tweets);
