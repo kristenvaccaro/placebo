@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 
 import Tweet from "./Tweet.js";
-import logo from "./Twitter_Logo_WhiteOnBlue.svg";
 import "./App.css";
 import TweetFilterer from "./TweetFilterer.js";
 import FilterControl from "./FilterControl.js";
@@ -29,7 +28,7 @@ class App extends Component {
   componentDidMount() {
     if (typeof Storage !== undefined) {
       const cacheHits = localStorage.getItem("time");
-      console.log(cacheHits)
+      console.log(cacheHits);
       if (cacheHits) {
         let last = new Date(cacheHits);
         let curr = new Date();
@@ -93,9 +92,19 @@ class App extends Component {
   render() {
     let auth = this.state.isAuthenticated ? (
       <span className="d-flex">
-        <span className=".d-none .d-md-block navbar-text mr-2">{this.state.user.username}</span>
-        <img className="rounded mr-1" src={this.state.user.photos[0].value} alt="profile" />
-        <button onClick={this.logout} className="btn btn-outline-light mr-1" type="button">
+        <span className="d-none d-lg-block navbar-text mr-2">
+          {this.state.user.username}
+        </span>
+        <img
+          className="rounded mr-1 img-fluid"
+          src={this.state.user.photos[0].value}
+          alt="profile"
+        />
+        <button
+          onClick={this.logout}
+          className="btn btn-outline-light mr-1"
+          type="button"
+        >
           Log out
         </button>
       </span>
@@ -111,7 +120,7 @@ class App extends Component {
     );
     return (
       <div className="App container-fluid">
-        <nav className="navbar navbar-dark App-header">
+        <nav className="navbar navbar-dark App-header fixed-top">
           <span className="navbar-brand mb-0 h1">Twitter Study</span>
           {auth}
         </nav>
@@ -123,10 +132,10 @@ class App extends Component {
             ))}
         </div>
 
-        <div className="App-footer">
+        <div className="App-footer fixed-bottom w-100 bg-dark">
           <FilterControl
-            dropdownClass={"Dropdown col-xs-2"}
-            sliderClass={"Slider col-xs-9"}
+            dropdownClass={"Dropdown col-xs-2 ml-2"}
+            sliderClass={"Slider col align-middle mt-4 mr-5"}
             onChange={filterState => this.loadFilteredTweets(filterState)}
             tweets={this.state.tweets}
           />

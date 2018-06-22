@@ -31,7 +31,7 @@ export default class TweetView extends Component {
     }
 
     let counts = (
-      <p>
+      <p className="mt-2">
         {tweet.retweeted ? (
           <span style={{ color: "#66ff99" }} className="mlr-2">
             <i className="fas fa-retweet mlr-1" />
@@ -98,7 +98,7 @@ export default class TweetView extends Component {
         <div className="w-100" />
         <a className="col-xs-2 col-md-1" href={tweet.user.url}>
           <img
-            className="rounded-circle"
+            className="rounded-circle img-fluid"
             src={tweet.user.profile_image_url}
             alt="tweet profile"
           />

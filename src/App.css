@@ -1,16 +1,9 @@
 .container-fluid {
   background-color: #fff;
   padding: 0;
+  padding-top: 70px;
 }
 
 .App-header {
   background-color: #1DA1F2 !important;
-}
-
-.App-footer {
-  position:fixed;
-  bottom: 0px;
-  width: 100%;
-  height: 100px;
-  background-color: black;
 }
