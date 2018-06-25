@@ -91,7 +91,7 @@ class App extends Component {
   };
 
   render() {
-    let base_url = process.env.ENV_URL : "http://localhost:3000";
+    let base_url = process.env.ENV_URL || "http://localhost:3000";
     let auth = this.state.isAuthenticated ? (
       <span className="d-flex">
         <span className="d-none d-lg-block navbar-text mr-2">
