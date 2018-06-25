@@ -29,10 +29,6 @@ var base_url = "http://127.0.0.1:3001/";
 if (process.env.NODE_ENV === "production") {
   app.use(app.use(express.static(path.resolve(__dirname, './build'))););
   base_url = process.env.REACT_APP_URL;
-  // All remaining requests return the React app, so it can handle routing.
-  app.get('*', function(request, response) {
-    response.sendFile(path.resolve(__dirname, './build', 'index.html'));
-  });
 }
 
 // enable cors
@@ -181,6 +177,13 @@ var authenticate = expressJwt({
 router.route("/auth/me").get(authenticate);
 
 app.use("/api", router);
+
+if (process.env.NODE_ENV === "production"){
+  // All remaining requests return the React app, so it can handle routing.
+  app.get('*', function(request, response) {
+    response.sendFile(path.resolve(__dirname, './build', 'index.html'));
+  });
+}
 
 app.listen(3000);
 module.exports = app;
