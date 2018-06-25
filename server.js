@@ -26,7 +26,7 @@ var app = express();
 var base_url = "http://127.0.0.1:3001/";
 
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static("build"));
+  app.use(express.static("/build"));
   base_url = process.env.REACT_APP_URL;
 }
 
@@ -180,4 +180,4 @@ app.use("/api/v1", router);
 app.listen(3000);
 module.exports = app;
 
-console.log("Server running at http://localhost:3000/");
+console.log("Server running at " + process.env.PORT);

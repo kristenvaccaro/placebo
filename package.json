@@ -1,7 +1,8 @@
 {
-  "name": "tweedstudy-react",
-  "version": "0.1.0",
+  "name": "placbo",
+  "version": "1.1.0",
   "private": true,
+  "homepage": "https://mini-twitter-feed.herokuapp.com",
   "dependencies": {
     "body-parser": "^1.18.3",
     "bootstrap": "^4.1.1",
@@ -33,7 +34,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "heroku-postbuild": "npm install && npm run build"
+    "heroku-postbuild": "npm install --only=dev --no-shrinkwrap && npm run build"
   },
   "proxy": "http://localhost:3000",
   "devDependencies": {
