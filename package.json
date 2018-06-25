@@ -26,12 +26,14 @@
     "twitter": "^1.7.1"
   },
   "scripts": {
-    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "start": "node server",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
     "client": "react-scripts start",
     "server": "nodemon server.js",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "heroku-postbuild": "npm install && npm run build"
   },
   "proxy": "http://localhost:3000",
   "devDependencies": {
