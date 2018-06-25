@@ -91,7 +91,7 @@ class App extends Component {
   };
 
   render() {
-    let base_url = process.env.ENV_URL || "http://localhost:3000";
+    let base_url = process.env.ENV_URL || "http://localhost:3000/";
     let loginUrl = base_url + "api/v1/auth/twitter";
     let requestTokenUrl = base_url + "api/v1/auth/twitter/reverse";
     let auth = this.state.isAuthenticated ? (
@@ -114,10 +114,10 @@ class App extends Component {
       </span>
     ) : (
       <TwitterLogin
-        loginUrl=loginUrl
+        loginUrl={loginUrl}
         onFailure={this.onFailed}
         onSuccess={this.onSuccess}
-        requestTokenUrl=requestTokenUrl
+        requestTokenUrl={requestTokenUrl}
         showIcon={false}
         className="my-2 my-sm-0 btn btn-primary"
       />
