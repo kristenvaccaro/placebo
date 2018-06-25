@@ -27,7 +27,7 @@ var app = express();
 var base_url = "http://127.0.0.1:3001/";
 
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static("/build"));
+  app.use(app.use(express.static(path.resolve(__dirname, './build'))););
   base_url = process.env.REACT_APP_URL;
   // All remaining requests return the React app, so it can handle routing.
   app.get('*', function(request, response) {
