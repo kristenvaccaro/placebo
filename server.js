@@ -27,7 +27,7 @@ var base_url = "http://127.0.0.1:3001/";
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static("build"));
-  base_url = process.env.ENV_URL;
+  base_url = process.env.REACT_APP_URL;
 }
 
 // enable cors
