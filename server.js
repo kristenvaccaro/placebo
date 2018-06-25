@@ -14,7 +14,7 @@ var passport = require("passport"),
 
 var passportConfig = require("./passport");
 
-var Twitter = require('twitter');
+var Twitter = require("twitter");
 var getData = require("./api/helpers/getData");
 var get_all_data_id = getData.get_all_data_id;
 
@@ -23,11 +23,11 @@ passportConfig();
 
 var app = express();
 
-var base_url = "http://127.0.0.1:3001"
+var base_url = "http://127.0.0.1:3001/";
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static("build"));
-  base_url = process.env.ENV_URL
+  base_url = process.env.ENV_URL;
 }
 
 // enable cors
@@ -71,15 +71,21 @@ var generateToken = function(req, res, next) {
 
 var sendToken = function(req, res) {
   res.setHeader("x-auth-token", req.token);
-  return res.status(200).send(JSON.stringify({user: req.user, tweets: req.tweets}));
+  return res
+    .status(200)
+    .send(JSON.stringify({ user: req.user, tweets: req.tweets }));
 };
 
-router.route("/auth/twitter/reverse").post(function(req, res) {
+router.route("/auth/twitter/reverse")
+.get(function(req, res){
+  res.sendStatus(200).send("Redirecting...")
+})
+.post(function(req, res) {
   request.post(
     {
       url: "https://api.twitter.com/oauth/request_token",
       oauth: {
-        oauth_callback: base_url,
+        oauth_callback: base_url+"auth/twitter",
         consumer_key: twitterConfig.consumerKey,
         consumer_secret: twitterConfig.consumerSecret
       }
@@ -139,17 +145,17 @@ router.route("/auth/twitter").post(
 
     return next();
   },
-  function (req, res, next) {
+  function(req, res, next) {
     var client = new Twitter({
       consumer_key: twitterConfig.consumerKey,
       consumer_secret: twitterConfig.consumerSecret,
       access_token_key: req.body.oauth_token,
       access_token_secret: req.body.oauth_token_secret
     });
-    get_all_data_id(client, 'statuses/home_timeline', function(tweets){
+    get_all_data_id(client, "statuses/home_timeline", function(tweets) {
       req.tweets = tweets;
       next();
-    })
+    });
   },
   generateToken,
   sendToken
