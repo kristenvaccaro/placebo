@@ -23,6 +23,13 @@ passportConfig();
 
 var app = express();
 
+var base_url = "http://127.0.0.1:3001"
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static("build"));
+  base_url = process.env.ENV_URL
+}
+
 // enable cors
 var corsOption = {
   origin: true,
@@ -72,7 +79,7 @@ router.route("/auth/twitter/reverse").post(function(req, res) {
     {
       url: "https://api.twitter.com/oauth/request_token",
       oauth: {
-        oauth_callback: "http://127.0.0.1:3001",
+        oauth_callback: base_url,
         consumer_key: twitterConfig.consumerKey,
         consumer_secret: twitterConfig.consumerSecret
       }

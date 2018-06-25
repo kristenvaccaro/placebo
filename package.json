@@ -3,9 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^1.2.0-14",
-    "@fortawesome/free-solid-svg-icons": "^5.1.0-11",
-    "@fortawesome/react-fontawesome": "0.1.0-11",
     "body-parser": "^1.18.3",
     "bootstrap": "^4.1.1",
     "cors": "^2.8.4",
@@ -20,7 +17,6 @@
     "rc-slider": "^8.4.0",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
-    "react-fontawesome": "^1.6.1",
     "react-moment": "^0.7.0",
     "react-scripts": "^1.1.4",
     "react-time": "^4.3.0",
@@ -33,10 +29,9 @@
     "start": "concurrently \"npm run server\" \"npm run client\"",
     "client": "react-scripts start",
     "server": "nodemon server.js",
-    "db": "mongod",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
   },
   "proxy": "http://localhost:3000",
   "devDependencies": {
