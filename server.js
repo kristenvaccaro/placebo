@@ -17,6 +17,7 @@ var passportConfig = require("./passport");
 var Twitter = require("twitter");
 var getData = require("./api/helpers/getData");
 var get_all_data_id = getData.get_all_data_id;
+const path = require('path');
 
 //setup configuration for facebook login
 passportConfig();
@@ -28,6 +29,10 @@ var base_url = "http://127.0.0.1:3001/";
 if (process.env.NODE_ENV === "production") {
   app.use(express.static("/build"));
   base_url = process.env.REACT_APP_URL;
+  // All remaining requests return the React app, so it can handle routing.
+  app.get('*', function(request, response) {
+    response.sendFile(path.resolve(__dirname, './build', 'index.html'));
+  });
 }
 
 // enable cors
@@ -175,9 +180,9 @@ var authenticate = expressJwt({
 
 router.route("/auth/me").get(authenticate);
 
-app.use("/api/v1", router);
+app.use("/api", router);
 
 app.listen(3000);
 module.exports = app;
 
-console.log("Server running at " + process.env.PORT);
+console.log("Server running at " + process.env.PORT || 3000);

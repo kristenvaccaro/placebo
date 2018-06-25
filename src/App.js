@@ -93,8 +93,8 @@ class App extends Component {
   render() {
     let base_url = process.env.REACT_APP_URL || "http://localhost:3000/";
     console.log(base_url)
-    let loginUrl = base_url + "api/v1/auth/twitter";
-    let requestTokenUrl = base_url + "api/v1/auth/twitter/reverse";
+    let loginUrl = base_url + "api/auth/twitter";
+    let requestTokenUrl = base_url + "api/auth/twitter/reverse";
     let auth = this.state.isAuthenticated ? (
       <span className="d-flex">
         <span className="d-none d-lg-block navbar-text mr-2">
