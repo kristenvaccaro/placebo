@@ -14,14 +14,22 @@ var passport = require("passport"),
 
 var passportConfig = require("./passport");
 
-var Twitter = require('twitter');
+var Twitter = require("twitter");
 var getData = require("./api/helpers/getData");
 var get_all_data_id = getData.get_all_data_id;
+const path = require('path');
 
 //setup configuration for facebook login
 passportConfig();
 
 var app = express();
+
+var base_url = "http://127.0.0.1:3001/";
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.resolve(__dirname, './build')));
+  base_url = process.env.REACT_APP_URL;
+}
 
 // enable cors
 var corsOption = {
@@ -64,15 +72,22 @@ var generateToken = function(req, res, next) {
 
 var sendToken = function(req, res) {
   res.setHeader("x-auth-token", req.token);
-  return res.status(200).send(JSON.stringify({user: req.user, tweets: req.tweets}));
+  return res
+    .status(200)
+    .send(JSON.stringify({ user: req.user, tweets: req.tweets }));
 };
 
-router.route("/auth/twitter/reverse").post(function(req, res) {
+router.route("/auth/twitter/reverse")
+.get(function(req, res){
+  res.sendStatus(200).send("Redirecting...")
+})
+.post(function(req, res) {
+  console.log(base_url+"auth/twitter")
   request.post(
     {
       url: "https://api.twitter.com/oauth/request_token",
       oauth: {
-        oauth_callback: "http://127.0.0.1:3001",
+        oauth_callback: base_url+"auth/twitter",
         consumer_key: twitterConfig.consumerKey,
         consumer_secret: twitterConfig.consumerSecret
       }
@@ -132,17 +147,17 @@ router.route("/auth/twitter").post(
 
     return next();
   },
-  function (req, res, next) {
+  function(req, res, next) {
     var client = new Twitter({
       consumer_key: twitterConfig.consumerKey,
       consumer_secret: twitterConfig.consumerSecret,
       access_token_key: req.body.oauth_token,
       access_token_secret: req.body.oauth_token_secret
     });
-    get_all_data_id(client, 'statuses/home_timeline', function(tweets){
+    get_all_data_id(client, "statuses/home_timeline", function(tweets) {
       req.tweets = tweets;
       next();
-    })
+    });
   },
   generateToken,
   sendToken
@@ -162,9 +177,18 @@ var authenticate = expressJwt({
 
 router.route("/auth/me").get(authenticate);
 
-app.use("/api/v1", router);
+app.use("/api", router);
 
-app.listen(3000);
+if (process.env.NODE_ENV === "production"){
+  // All remaining requests return the React app, so it can handle routing.
+  app.get('*', function(request, response) {
+    response.sendFile(path.resolve(__dirname, './build', 'index.html'));
+  });
+}
+
+const port = process.env.PORT || 3000;
+
+app.listen(port);
+console.log("Server running at " + port);
+
 module.exports = app;
-
-console.log("Server running at http://localhost:3000/");
