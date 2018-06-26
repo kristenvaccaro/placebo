@@ -27,7 +27,7 @@ var app = express();
 var base_url = "http://127.0.0.1:3001/";
 
 if (process.env.NODE_ENV === "production") {
-  app.use(app.use(express.static(path.resolve(__dirname, './build'))););
+  app.use(express.static(path.resolve(__dirname, './build')));
   base_url = process.env.REACT_APP_URL;
 }
 
@@ -82,6 +82,7 @@ router.route("/auth/twitter/reverse")
   res.sendStatus(200).send("Redirecting...")
 })
 .post(function(req, res) {
+  console.log(base_url+"auth/twitter")
   request.post(
     {
       url: "https://api.twitter.com/oauth/request_token",
@@ -188,6 +189,6 @@ if (process.env.NODE_ENV === "production"){
 const port = process.env.PORT || 3000;
 
 app.listen(port);
-console.log("Server running at " + );
+console.log("Server running at " + port);
 
 module.exports = app;
