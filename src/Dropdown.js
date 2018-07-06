@@ -3,7 +3,7 @@ import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 
-import {FREQUENCY, CELEBRITY, POPULARITY, CLOSENESS, SENTIMENT } from './TweetFilterer';
+import {FREQUENCY, CELEBRITY, POPULARITY, POPULARITYRANDOM, CLOSENESS, SENTIMENT } from './TweetFilterer';
 
 const styles = {
     customColor: {
@@ -16,7 +16,7 @@ export default class FeatureDropdown extends React.Component {
     constructor(props) {
         super(props);
         this.state = {value: props.value};
-        this.options = [POPULARITY, FREQUENCY];
+        this.options = [POPULARITY, POPULARITYRANDOM, FREQUENCY];
     }
 
     handleChange = (event, index, value) => {

@@ -2,6 +2,7 @@ import 'rc-slider/assets/index.css';
 const FREQUENCY = "Frequency";
 const CELEBRITY = "Celebrity";
 const POPULARITY = "Popularity";
+const POPULARITYRANDOM = "PopularityRandom";
 const CLOSENESS = "Closeness";
 const SENTIMENT = "Sentiment";
 export default class TweetFilterer {
@@ -22,6 +23,9 @@ export default class TweetFilterer {
                       break;
                   case POPULARITY:
                       func = t => t.getPopularity();
+                      break;
+                  case POPULARITYRANDOM:
+                      func = t => t.getPopularityRandom();
                       break;
                   case SENTIMENT:
                       func = t => t.getSentiment();
@@ -49,4 +53,4 @@ export default class TweetFilterer {
   }
 
 }
-export { TweetFilterer, FREQUENCY, CELEBRITY, POPULARITY, CLOSENESS, SENTIMENT };
+export { TweetFilterer, FREQUENCY, CELEBRITY, POPULARITY, POPULARITYRANDOM, CLOSENESS, SENTIMENT };
