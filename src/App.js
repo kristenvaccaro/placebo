@@ -8,7 +8,20 @@ import TweetView from "./TweetView";
 
 import TwitterLogin from "react-twitter-auth";
 
-var shuffle = require('shuffle-array');
+var shuffle = require("shuffle-array");
+
+/* N     = no control, most recent
+   NR    = no control, random subset of feed
+   YPOP  = yes control, popularity real
+   YPOPR = yes control, popularity random
+   YR    = yes control, random = random
+*/
+const OPTIONS = ["N", "NR", "YPOP", "YPOPR", "YR"];
+const CONTROL = false;
+const RANDOM = false;
+const POPR = false;
+
+const TWEET_DISPLAY_RANGE = 20;
 
 class App extends Component {
   constructor(props) {
@@ -78,9 +91,16 @@ class App extends Component {
         this.setState({ isAuthenticated: true, user: data.user, token: token });
         let allTweets = data.tweets.map(t => new Tweet(t));
 
-        var allPopularityValues = allTweets.map((tweet, i) => tweet.retweet_count );
-        shuffle(allPopularityValues);
-        allTweets.forEach(tweet => tweet.random_retweet_count = allPopularityValues.pop() );
+        var allPopularityValues = allTweets.map(
+          (tweet, i) => tweet.retweet_count
+        );
+
+        if (POPR){
+          shuffle(allPopularityValues);
+          allTweets.forEach(
+            tweet => (tweet.random_retweet_count = allPopularityValues.pop())
+          );
+        }
         console.log(allTweets);
 
         this.filterer = new TweetFilterer(allTweets);
@@ -100,7 +120,7 @@ class App extends Component {
 
   render() {
     let base_url = process.env.REACT_APP_URL || "http://localhost:3000/";
-    console.log(base_url)
+    console.log(base_url);
     let loginUrl = base_url + "api/auth/twitter";
     let requestTokenUrl = base_url + "api/auth/twitter/reverse";
     let auth = this.state.isAuthenticated ? (
@@ -140,19 +160,21 @@ class App extends Component {
 
         <div className="Tweet-list ml-xs-1 ml-md-5 mt-2">
           {this.state.isAuthenticated &&
-            this.state.tweets.map(r => (
+            this.state.tweets.slice(0, TWEET_DISPLAY_RANGE).map(r => (
               <TweetView key={r.id.toString()} tweet={r} />
             ))}
         </div>
 
-        <div className="App-footer fixed-bottom w-100 bg-dark">
-          <FilterControl
-            dropdownClass={"Dropdown col-xs-2 ml-2"}
-            sliderClass={"Slider col mt-4 mr-5"}
-            onChange={filterState => this.loadFilteredTweets(filterState)}
-            tweets={this.allTweets}
-          />
-        </div>
+        { CONTROL &&
+          <div className="App-footer fixed-bottom w-100 bg-dark">
+            <FilterControl
+              dropdownClass={"Dropdown col-xs-2 ml-2"}
+              sliderClass={"Slider col mt-4 mr-5"}
+              onChange={filterState => this.loadFilteredTweets(filterState)}
+              tweets={this.allTweets}
+            />
+          </div>
+        }
       </div>
     );
   }
