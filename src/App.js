@@ -17,11 +17,29 @@ var shuffle = require("shuffle-array");
    YR    = yes control, random = random
 */
 const OPTIONS = ["N", "NR", "YPOP", "YPOPR", "YR"];
-const CONTROL = false;
-const RANDOM = false;
-const POPR = false;
+var CONTROL = true;
+var RANDOM = false;
 
 const TWEET_DISPLAY_RANGE = 20;
+
+function postData(url, data) {
+  // Default options are marked with *
+  return fetch(url, {
+    method: "POST", // *GET, POST, PUT, DELETE, etc.
+    mode: "cors", // no-cors, cors, *same-origin
+    headers: {
+      "Content-Type": "application/json; charset=utf-8"
+      // "Content-Type": "application/x-www-form-urlencoded",
+    },
+    redirect: "follow", // manual, *follow, error
+    referrer: "no-referrer", // no-referrer, *client
+    body: JSON.stringify(data) // body data type must match "Content-Type" header
+  }).then(response => {
+    if (response.status !== 200){
+      alert(response.status + ' ' + response.statusText)
+    }
+  }); // parses response to JSON
+}
 
 class App extends Component {
   constructor(props) {
@@ -34,7 +52,8 @@ class App extends Component {
       isAuthenticated: false,
       user: null,
       tweets: [],
-      token: ""
+      token: "",
+      clicked: false
     };
 
     this.filterer = new TweetFilterer([]);
@@ -65,6 +84,11 @@ class App extends Component {
     }
   }
 
+  setup = () => {
+    CONTROL = Math.floor(Math.random() * 2);
+    RANDOM = Math.floor(Math.random() * 2);
+  };
+
   onSliderChange(value) {
     this.setState({
       value
@@ -84,9 +108,14 @@ class App extends Component {
     const token = response.headers.get("x-auth-token");
     response.json().then(data => {
       if (token) {
-        localStorage.setItem("user", JSON.stringify(data.user));
-        localStorage.setItem("tweets", JSON.stringify(data.tweets));
-        localStorage.setItem("time", Date());
+        this.setup();
+        postData(
+          "/api/settings",
+          {
+            user: data.user,
+            settings: { control: CONTROL, random: RANDOM }
+          }
+        );
 
         this.setState({ isAuthenticated: true, user: data.user, token: token });
         let allTweets = data.tweets.map(t => new Tweet(t));
@@ -95,16 +124,21 @@ class App extends Component {
           (tweet, i) => tweet.retweet_count
         );
 
-        if (POPR){
+        if (RANDOM) {
           shuffle(allPopularityValues);
           allTweets.forEach(
             tweet => (tweet.random_retweet_count = allPopularityValues.pop())
           );
         }
-        console.log(allTweets);
 
         this.filterer = new TweetFilterer(allTweets);
         this.setState({ tweets: allTweets });
+
+        console.log(data.user);
+
+        localStorage.setItem("user", JSON.stringify(data.user));
+        localStorage.setItem("tweets", JSON.stringify(this.allTweets));
+        localStorage.setItem("time", Date());
       }
     });
   };
@@ -117,6 +151,13 @@ class App extends Component {
     this.setState({ isAuthenticated: false, token: "", user: null });
     localStorage.clear();
   };
+
+  handleClick = () => {
+    if (!this.state.clicked){
+      this.setState({ clicked: true })
+      postData("/api/clicked", { user: this.state.user })
+    }
+  }
 
   render() {
     let base_url = process.env.REACT_APP_URL || "http://localhost:3000/";
@@ -160,21 +201,22 @@ class App extends Component {
 
         <div className="Tweet-list ml-xs-1 ml-md-5 mt-2">
           {this.state.isAuthenticated &&
-            this.state.tweets.slice(0, TWEET_DISPLAY_RANGE).map(r => (
-              <TweetView key={r.id.toString()} tweet={r} />
-            ))}
+            this.state.tweets
+              .slice(0, TWEET_DISPLAY_RANGE)
+              .map(r => <TweetView key={r.id.toString()} tweet={r} />)}
         </div>
 
-        { CONTROL &&
+        {CONTROL && (
           <div className="App-footer fixed-bottom w-100 bg-dark">
             <FilterControl
               dropdownClass={"Dropdown col-xs-2 ml-2"}
               sliderClass={"Slider col mt-4 mr-5"}
               onChange={filterState => this.loadFilteredTweets(filterState)}
               tweets={this.allTweets}
+              onClick={() => this.handleClick()}
             />
           </div>
-        }
+        )}
       </div>
     );
   }
