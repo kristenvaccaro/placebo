@@ -4,7 +4,7 @@
       name      : "placebo",
       script    : "npm",
       interpreter: "none",
-      args: "run dev"
+      args: "start"
     }
   ]
 }

@@ -11,6 +11,7 @@ var passport = require("passport"),
   bodyParser = require("body-parser"),
   request = require("request"),
   twitterConfig = require("./twitter.config.js");
+console.log(twitterConfig);
 
 var passportConfig = require("./passport");
 

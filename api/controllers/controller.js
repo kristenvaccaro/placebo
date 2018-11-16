@@ -44,7 +44,6 @@ exports.get_friends = function(req, res) {
 
 // GET /auth/twitter
 exports.authenticate = function(req, res) {
-  console.log(process.env.CONSUMER_KEY);
   var oauth = {
     callback: process.env.REACT_APP_URL || "http://127.0.0.1:3001",
     consumer_key: process.env.CONSUMER_KEY || "eiVbxbQIfNYWCJJfXXwkSTflK",
@@ -52,6 +51,7 @@ exports.authenticate = function(req, res) {
       process.env.CONSUMER_SECRET ||
       "8zJtZZATHYxh2sh7uAXhJBufhtUfPfffqE6nI0IQXf7h577nbe"
   };
+  console.log(oauth);
   var url = "https://api.twitter.com/oauth/request_token";
   request.post({ url: url, oauth: oauth }, function(e, r, body) {
     var req_data = qs.parse(body);
