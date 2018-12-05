@@ -1,17 +1,18 @@
-import React, { Component } from 'react';
-import Tweet from './Tweet.js';
-import logo from './Twitter_Logo_WhiteOnBlue.svg';
-import Authentication from './Authentication/Authentication.js';
-import './App.css';
-import './Authentication/Authentication';
-import TweetFilterer from './TweetFilterer.js';
-import './App.css';
-import FilterControl from './FilterControl.js';
-import TweetView from './TweetView';
+import React, { Component } from "react";
 
-import { logger } from './Logger';
+import Tweet from "./Tweet.js";
+import "./App.css";
+import TweetFilterer from "./TweetFilterer.js";
+import FilterControl from "./FilterControl.js";
+import TweetView from "./TweetView";
 
- class App extends Component {
+import TwitterLogin from "react-twitter-auth";
+
+import { logger } from "./Logger";
+
+var shuffle = require('shuffle-array');
+
+class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -50,6 +51,7 @@ import { logger } from './Logger';
           });
         }
       }
+    }
       this.setScrollListener();
   }
 
@@ -77,6 +79,7 @@ import { logger } from './Logger';
         localStorage.setItem("time", Date());
 
         this.setState({ isAuthenticated: true, user: data.user, token: token });
+        logger.setUsername(data.user.username);
         let allTweets = data.tweets.map(t => new Tweet(t));
 
         var allPopularityValues = allTweets.map((tweet, i) => tweet.retweet_count );
@@ -86,13 +89,6 @@ import { logger } from './Logger';
 
         this.filterer = new TweetFilterer(allTweets);
         this.setState({ tweets: allTweets });
-  setScrollListener() {
-      const parent = document.getElementById("base");
-      const html = document.querySelector("html");
-      let timeoutId = 0;
-      const onScroll = () => {
-          clearTimeout(timeoutId);
-          timeoutId = setTimeout(() => logger.logInfo(`Scrolled to ${100 * html.scrollTop / html.scrollHeight}%`), 150);
       }
     });
   };
@@ -105,6 +101,17 @@ import { logger } from './Logger';
     this.setState({ isAuthenticated: false, token: "", user: null });
     localStorage.clear();
   };
+
+  setScrollListener() {
+      const parent = document.getElementById("base");
+      const html = document.querySelector("html");
+      let timeoutId = 0;
+      const onScroll = () => {
+          clearTimeout(timeoutId);
+          timeoutId = setTimeout(() => logger.logInfo(`Scrolled to ${100 * html.scrollTop / html.scrollHeight}%`), 150);
+      }
+      parent.onscroll = onScroll;
+  }
 
   render() {
     let base_url = process.env.REACT_APP_URL || "http://localhost:3000/";
