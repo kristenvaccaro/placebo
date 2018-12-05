@@ -3,6 +3,8 @@ import FeatureDropdown from './Dropdown.js'
 import Slider  from 'rc-slider';
 import { FREQUENCY, CELEBRITY, POPULARITY, POPULARITYRANDOM, CLOSENESS, SENTIMENT } from './TweetFilterer';
 
+import { logger } from './Logger';
+
 export default class FilterControl extends Component {
     constructor(props) {
         const LOW_NUMBER = -10000;
@@ -28,6 +30,7 @@ export default class FilterControl extends Component {
     }
 
     onDropdownChange(event, index, value) {
+        logger.logInfo(`Changed to ${value} filtering`);
         this.setState({currentFeature: value});
     }
 
@@ -144,6 +147,10 @@ export default class FilterControl extends Component {
         return lowest;
     }
 
+    onLift(value) {
+        logger.logInfo(`Changed slider to ${value} on ${this.state.currentFeature}`);
+    }
+
     render() {
         let lowestFeature;
         let highestFeature;
@@ -160,7 +167,7 @@ export default class FilterControl extends Component {
                     <FeatureDropdown onChange={ this.onDropdownChange.bind(this) } value={ this.state.currentFeature } />
                 </span>
                 <span className={ this.props.sliderClass }>
-                    <Slider min={ lowestFeature } max={ highestFeature } onChange={ this.onSliderChange.bind(this) } defaultValue={ this.state.filterStatus[this.state.currentFeature] }/>
+                    <Slider min={ lowestFeature } max={ highestFeature } onChange={ this.onSliderChange.bind(this) } onAfterChange={ this.onLift.bind(this) } defaultValue={ this.state.filterStatus[this.state.currentFeature] }/>
                 </span>
             </div>
         );
