@@ -1,16 +1,17 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
+import Tweet from './Tweet.js';
+import logo from './Twitter_Logo_WhiteOnBlue.svg';
+import Authentication from './Authentication/Authentication.js';
+import './App.css';
+import './Authentication/Authentication';
+import TweetFilterer from './TweetFilterer.js';
+import './App.css';
+import FilterControl from './FilterControl.js';
+import TweetView from './TweetView';
 
-import Tweet from "./Tweet.js";
-import "./App.css";
-import TweetFilterer from "./TweetFilterer.js";
-import FilterControl from "./FilterControl.js";
-import TweetView from "./TweetView";
+import { logger } from './Logger';
 
-import TwitterLogin from "react-twitter-auth";
-
-var shuffle = require('shuffle-array');
-
-class App extends Component {
+ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -49,7 +50,7 @@ class App extends Component {
           });
         }
       }
-    }
+      this.setScrollListener();
   }
 
   onSliderChange(value) {
@@ -85,6 +86,13 @@ class App extends Component {
 
         this.filterer = new TweetFilterer(allTweets);
         this.setState({ tweets: allTweets });
+  setScrollListener() {
+      const parent = document.getElementById("base");
+      const html = document.querySelector("html");
+      let timeoutId = 0;
+      const onScroll = () => {
+          clearTimeout(timeoutId);
+          timeoutId = setTimeout(() => logger.logInfo(`Scrolled to ${100 * html.scrollTop / html.scrollHeight}%`), 150);
       }
     });
   };
