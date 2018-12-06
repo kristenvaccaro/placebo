@@ -12,13 +12,13 @@ const mongo_connection_uri = 'mongodb://tweed-study:uiuc2017@ds251245.mlab.com:5
 var db;
 
 //Establishes connection with mongo_db
-mongodb.MongoClient.connect(mongo_connection_uri, function (err, database) {
+mongodb.MongoClient.connect(mongo_connection_uri, function (err, client) {
     if (err) {
         console.log(err);
         process.exit(1);
     }
     // Save database object from the callback for reuse.
-    db = database;
+    db = client.db("tweed-study");
     console.log("Database connection ready from controller");
 });
 /**

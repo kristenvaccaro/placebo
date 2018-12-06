@@ -44,6 +44,7 @@ exports.post_log = function(req, res) {
     let body = req.body
     console.log(body);
     pushData.addLog(body);
+    res.send("Successfully logged");
     res.end();
 }
 

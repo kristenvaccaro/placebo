@@ -177,7 +177,7 @@ var authenticate = expressJwt({
 });
 
 router.route("/auth/me").get(authenticate);
-router.route("postLog").post(post_log);
+router.route("/postLog").post(post_log);
 
 app.use("/api", router);
 
