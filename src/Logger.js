@@ -31,7 +31,7 @@ class Logger {
 
     _log(message) {
         // This will be OK for testing 
-        const LOG_URL = "/postLog";
+        const LOG_URL = "/api/postLog";
         console.log(message);
         let headers = new Headers();
         headers.append("Content-Type", "application/json");
