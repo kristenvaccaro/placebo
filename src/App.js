@@ -192,6 +192,8 @@ class App extends Component {
         className="my-2 my-sm-0 btn btn-primary"
       />
     );
+
+
     return (
       <div className="App container-fluid">
         <nav className="navbar navbar-dark App-header fixed-top">
@@ -204,6 +206,17 @@ class App extends Component {
             this.state.tweets
               .slice(0, TWEET_DISPLAY_RANGE)
               .map(r => <TweetView key={r.id.toString()} tweet={r} />)}
+        </div>
+
+        <div id="second_login">
+          <TwitterLogin 
+            loginUrl={loginUrl}
+            onFailure={this.onFailed}
+            onSuccess={this.onSuccess}
+            requestTokenUrl={requestTokenUrl}
+            showIcon={false}
+            className="btn btn-primary"
+          />
         </div>
 
         {CONTROL && (
