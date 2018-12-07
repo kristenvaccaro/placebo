@@ -162,7 +162,7 @@ export default class FilterControl extends Component {
             highestFeature = 100;
         }
         return (
-            <div className="row">
+            <div className="row" onClick={this.props.onClick}>
                 <span className={ this.props.dropdownClass }>
                     <FeatureDropdown onChange={ this.onDropdownChange.bind(this) } value={ this.state.currentFeature } />
                 </span>

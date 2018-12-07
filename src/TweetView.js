@@ -22,7 +22,7 @@ export default class TweetView extends Component {
     if (tweet.entities.media) {
       media = (
         <img
-          className="img-fluid rounded"
+          className="img-fluid rounded w-50"
           width={tweet.entities.media[0].sizes.thumb.w * 5}
           src={tweet.entities.media[0].media_url}
           alt="tweet img"
@@ -98,7 +98,7 @@ export default class TweetView extends Component {
         <div className="w-100" />
         <a className="col-xs-2 col-md-1" href={tweet.user.url}>
           <img
-            className="rounded-circle img-fluid"
+            className="img-fluid rounded-circle"
             src={tweet.user.profile_image_url}
             alt="tweet profile"
           />

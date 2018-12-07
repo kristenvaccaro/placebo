@@ -179,6 +179,15 @@ var authenticate = expressJwt({
 router.route("/auth/me").get(authenticate);
 router.route("/postLog").post(post_log);
 
+router.route("/clicked").post(function (req, res) {
+  console.log(req.body.user)
+})
+
+router.route("/settings").post(function (req, res) {
+  console.log(req.body.user)
+  console.log(req.body.settings)
+})
+
 app.use("/api", router);
 
 if (process.env.NODE_ENV === "production"){
