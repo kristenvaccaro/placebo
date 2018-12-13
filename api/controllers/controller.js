@@ -4,9 +4,6 @@ var qs = require("querystring");
 var request = require("request");
 var Twitter = require("twitter");
 
-var mongoose = require("mongoose"),
-  Task = mongoose.model("Tasks");
-
 // Import getData functions for gathering data from Twitter API
 var getData = require("../helpers/getData");
 var get_data = getData.get_data;
@@ -40,7 +37,16 @@ exports.get_messages = function(req, res) {
 exports.get_friends = function(req, res) {
   var json = readJsonFile("data/friends.json");
   res.json(json);
-};
+}
+
+// POST /postLog
+exports.post_log = function(req, res) {
+    let body = req.body
+    console.log(body);
+    pushData.addLog(body);
+    res.send("Successfully logged");
+    res.end();
+}
 
 // GET /auth/twitter
 exports.authenticate = function(req, res) {

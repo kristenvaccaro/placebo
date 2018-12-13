@@ -5,19 +5,20 @@ const FRIENDS_COLLECTION = 'friends';
 const USERS_COLLECTION  = 'users';
 const MESSAGES_COLLECTION = 'messages';
 const TWEETS_COLLECTION = 'tweets';
+const LOGS_COLLECTION = 'logs';
 const mongodb = require('mongodb');
 const ObjectID = mongodb.ObjectID;
 const mongo_connection_uri = 'mongodb://tweed-study:uiuc2017@ds251245.mlab.com:51245/tweed-study';
 var db;
 
 //Establishes connection with mongo_db
-mongodb.MongoClient.connect(mongo_connection_uri, function (err, database) {
+mongodb.MongoClient.connect(mongo_connection_uri, function (err, client) {
     if (err) {
         console.log(err);
         process.exit(1);
     }
     // Save database object from the callback for reuse.
-    db = database;
+    db = client.db("tweed-study");
     console.log("Database connection ready from controller");
 });
 /**
@@ -77,6 +78,14 @@ var addTweet = function (data) {
 var addMessage = function (data) {
     addData(MESSAGES_COLLECTION, data);
 }
+
+/**
+ * @param data the log message
+ */
+var addLog = function (data) {
+    addData(LOGS_COLLECTION, data);
+}
+
 /**
  * Updates the user with the specific id in mongoDB
  * @param data (The JSON data representing the new version of the user
@@ -133,5 +142,6 @@ function push_to_database(id, friends, tweets, messages) {
 }
 
 module.exports = {
-    push_to_database : push_to_database
+    push_to_database : push_to_database,
+    addLog
 }

@@ -8,6 +8,10 @@ import TweetView from "./TweetView";
 
 import TwitterLogin from "react-twitter-auth";
 
+
+import { logger } from "./Logger";
+
+
 var shuffle = require("shuffle-array");
 
 /* N     = no control, most recent
@@ -82,6 +86,7 @@ class App extends Component {
         }
       }
     }
+      this.setScrollListener();
   }
 
   setup = () => {
@@ -118,6 +123,7 @@ class App extends Component {
         );
 
         this.setState({ isAuthenticated: true, user: data.user, token: token });
+        logger.setUsername(data.user.username);
         let allTweets = data.tweets.map(t => new Tweet(t));
 
         var allPopularityValues = allTweets.map(
@@ -151,6 +157,18 @@ class App extends Component {
     this.setState({ isAuthenticated: false, token: "", user: null });
     localStorage.clear();
   };
+
+
+  setScrollListener() {
+      const parent = document.getElementById("base");
+      const html = document.querySelector("html");
+      let timeoutId = 0;
+      const onScroll = () => {
+          clearTimeout(timeoutId);
+          timeoutId = setTimeout(() => logger.logInfo(`Scrolled to ${100 * html.scrollTop / html.scrollHeight}%`), 150);
+      }
+      parent.onscroll = onScroll;
+  }
 
   handleClick = () => {
     if (!this.state.clicked){

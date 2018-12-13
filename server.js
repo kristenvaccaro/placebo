@@ -1,7 +1,5 @@
 "use strict";
 
-//mongoose file must be loaded before all other files in order to provide
-// models to other modules
 var passport = require("passport"),
   express = require("express"),
   jwt = require("jsonwebtoken"),
@@ -11,7 +9,9 @@ var passport = require("passport"),
   bodyParser = require("body-parser"),
   request = require("request"),
   twitterConfig = require("./twitter.config.js");
+
 console.log(twitterConfig);
+let post_log = require("./api/controllers/controller").post_log;
 
 var passportConfig = require("./passport");
 
@@ -177,6 +177,7 @@ var authenticate = expressJwt({
 });
 
 router.route("/auth/me").get(authenticate);
+router.route("/postLog").post(post_log);
 
 router.route("/clicked").post(function (req, res) {
   console.log(req.body.user)
