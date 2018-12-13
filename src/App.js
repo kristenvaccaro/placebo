@@ -86,8 +86,32 @@ class App extends Component {
   }
 
   setup = () => {
-    CONTROL = Math.floor(Math.random() * 2);
-    RANDOM = Math.floor(Math.random() * 2);
+    /* N     = no control, most recent
+   NR    = no control, random subset of feed
+   YPOP  = yes control, popularity real
+   YPOPR = yes control, popularity random
+   YR    = yes control, random = random
+*/
+
+    CONDITION = OPTIONS[Math.floor(Math.random() * 6)]
+    // write (user, CONDITON) to database
+    //if we are assigning experimental conditions before running trial
+    // cond_1 = COUNT(Users) FROM X WHERE X.Condition = 1...for all six conditions
+    //assign current user to condition with the least, if there is no minimum, assign random
+
+    if (CONDITION === OPTIONS[0]) {
+      CONTROL = false;
+      RANDOM = false;
+    } else if (CONDITION === OPTIONS[1]) {
+      CONTROL = false;
+      RANDOM = true;
+    } else if (CONDITION === OPTIONS[2]) {
+      CONTROL = true;
+      RANDOM = false;
+    } else if (CONDITION === OPTIONS[3]) {
+      CONTROL = true;
+      RANDOM = true;
+    }
   };
 
   onSliderChange(value) {
@@ -107,12 +131,6 @@ class App extends Component {
 
   onSuccess = response => {
     const token = response.headers.get("x-auth-token");
-
-    CONDITION = OPTIONS[Math.floor(Math.random() * 6)]
-    // write (user, CONDITON) to database
-    //if we are assigning experimental conditions before running trial
-    // cond_1 = COUNT(Users) FROM X WHERE X.Condition = 1...for all six conditions
-    //assign current user to condition with the least, if there is no minimum, assign random
 
     response.json().then(data => {
       if (token) {
