@@ -19,6 +19,7 @@ var shuffle = require("shuffle-array");
 const OPTIONS = ["N", "NR", "YPOP", "YPOPR", "YR"];
 var CONTROL = true;
 var RANDOM = false;
+var CONDITION = "";
 
 const TWEET_DISPLAY_RANGE = 20;
 
@@ -106,6 +107,13 @@ class App extends Component {
 
   onSuccess = response => {
     const token = response.headers.get("x-auth-token");
+
+    CONDITION = OPTIONS[Math.floor(Math.random() * 6)]
+    // write (user, CONDITON) to database
+    //if we are assigning experimental conditions before running trial
+    // cond_1 = COUNT(Users) FROM X WHERE X.Condition = 1...for all six conditions
+    //assign current user to condition with the least, if there is no minimum, assign random
+
     response.json().then(data => {
       if (token) {
         this.setup();
@@ -192,8 +200,6 @@ class App extends Component {
         className="my-2 my-sm-0 btn btn-primary"
       />
     );
-
-
     return (
       <div className="App container-fluid">
         <nav className="navbar navbar-dark App-header fixed-top">
