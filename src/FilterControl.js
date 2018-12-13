@@ -10,23 +10,38 @@ export default class FilterControl extends Component {
         const LOW_NUMBER = -10000;
         super(props)
         let filterStatus = {};
-        // NB That sentiment can be negative, so we can't set these to 0,
-        // but we can't ask the tweets because it takes forever and also
-        // we don't have them on construction. So, we have this.
-        // Don't tell anyone.
-        [FREQUENCY, CELEBRITY, POPULARITY, POPULARITYRANDOM, CLOSENESS, SENTIMENT]
-            .forEach(feature => filterStatus[feature] = LOW_NUMBER);
 
         let currentFeature = POPULARITY;
-        this.state = {currentFeature, filterStatus};
+        this.state = {
+            currentFeature,
+            filterStatus, 
+            highChecked: false,
+            lowChecked: false
+        };
     }
 
-    onSliderChange(value) {
+    onFilterChange() {
         let filterStatus = this.state.filterStatus;
-        filterStatus[this.state.currentFeature] = value;
+        let h = this.state.highChecked
+        let l = this.state.lowChecked;
+        const LOW = 10;
+        const HIGH = 100;
+        if(h && l) {
+            filterStatus[this.state.currentFeature] = 
+                (t) => t.getFeature(this.state.currentFeature) >= HIGH ||
+                t.getFeature(this.state.currentFeature) <= LOW;
+        } else if(!h && l) {
+            filterStatus[this.state.currentFeature] = 
+                (t) => t.getFeature(this.state.currentFeature) <= LOW;
+        } else if(h && !l) {
+            filterStatus[this.state.currentFeature] = 
+                (t) => t.getFeature(this.state.currentFeature) >= HIGH;
+        } else if(!h && !l) {
+            filterStatus[this.state.currentFeature] = 
+                (t) => true;
+        }
         this.setState({filterStatus},
             (_, __) => this.props.onChange(filterStatus));
-
     }
 
     onDropdownChange(event, index, value) {
@@ -67,12 +82,10 @@ export default class FilterControl extends Component {
 
     getHighestCloseness(tweets) {
         let ret = Math.max(...tweets.map(t => t.getCloseness()));
-        console.log(`highest closeness is ${ret}`);
         return ret;
     }
     getLowestCloseness(tweets) {
         let ret = Math.min(...tweets.map(t => t.getCloseness()));
-        console.log(`lowest closeness is ${ret}`);
         return ret;
     }
 
@@ -167,7 +180,15 @@ export default class FilterControl extends Component {
                     <FeatureDropdown onChange={ this.onDropdownChange.bind(this) } value={ this.state.currentFeature } />
                 </span>
                 <span className={ this.props.sliderClass }>
-                    <Slider min={ lowestFeature } max={ highestFeature } onChange={ this.onSliderChange.bind(this) } onAfterChange={ this.onLift.bind(this) } defaultValue={ this.state.filterStatus[this.state.currentFeature] }/>
+                    <label>
+                        Show popular tweets
+                        <input type="checkbox" name="highBox" checked={ this.state.highChecked } onChange={(e) => { this.setState({ highChecked: e.target.checked }); this.onChange(); }}>
+                    <\label>
+
+                    <label>
+                        Show unpopular tweets
+                        <input type="checkbox" name="lowBox" checked={ this.state.lowChecked } onChange={(e) => { this.setState({ lowChecked: e.target.checked }); this.onChange(); }}>
+                    <\label>
                 </span>
             </div>
         );

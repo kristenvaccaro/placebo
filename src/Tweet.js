@@ -1,5 +1,6 @@
 import { happyWords, sadWords } from './wordlists';
 import App from './App';
+import { FREQUENCY, CELEBRITY, POPULARITY, POPULARITYRANDOM, CLOSENESS, SENTIMENT } from './TweetFilterer';
 
 var wordSentiments = {};
 var wordsHash = new Map();
@@ -37,6 +38,24 @@ class Tweet {
         this.getCloseness()
         this.getFrequency();
         this.getCelebrity();
+    }
+
+    getFeature(name) {
+        { FREQUENCY, CELEBRITY, POPULARITY, POPULARITYRANDOM, CLOSENESS, SENTIMENT }
+        switch(name) {
+            case FREQUENCY:
+                return this.getFrequency();
+            case CELEBRITY:
+                return this.getCelebrity();
+            case POPULARITY:
+                return this.getPopularity();
+            case POPULARITYRANDOM:
+                return this.getPopularityRandom();
+            case CLOSENESS:
+                return this.getCloseness();
+            case SENTIMENT:
+                return this.getSentiment();
+        }
     }
 
     getPopularity() {

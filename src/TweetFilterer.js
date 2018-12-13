@@ -12,34 +12,14 @@ export default class TweetFilterer {
 
   async filterTweets(filterObject) {
       let _filterTweets = (tweets, filterObject) => {
-          for(let key in filterObject) {
-              let func;
-              switch(key) {
-                  case FREQUENCY:
-                      func = t => t.getFrequency();
-                      break;
-                  case CELEBRITY:
-                      func = t => t.getCelebrity();
-                      break;
-                  case POPULARITY:
-                      func = t => t.getPopularity();
-                      break;
-                  case POPULARITYRANDOM:
-                      func = t => t.getPopularityRandom();
-                      break;
-                  case SENTIMENT:
-                      func = t => t.getSentiment();
-                      break;
-                  case CLOSENESS:
-                      func = t => t.getCloseness();
-                      break;
-                  default:
-                      throw new Error(`You gave me ${key} as a key, but that's not an available key!`);
-
-              }
-              tweets = tweets.filter(tweet => func(tweet) >= filterObject[key]);
-          } 
-          return tweets;
+          let filterOne = (t) => {
+              for(let f of filterObject)
+                  if(!f(t))
+                      return false;
+              return true;
+          }
+        tweets = tweets.filter(filterOne);
+        return tweets;
       };
 
       if(filterObject === null)
