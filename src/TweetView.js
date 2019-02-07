@@ -93,7 +93,7 @@ export default class TweetView extends Component {
     );
 
     return (
-      <div id="tweet" className="row justify-content-center">
+      <div id="tweet" className="singleTweet row justify-content-center">
         {retweet_status}
         <div className="w-100" />
         <a className="col-xs-2 col-md-1" href={tweet.user.url}>
