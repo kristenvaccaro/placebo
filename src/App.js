@@ -213,7 +213,7 @@ class App extends Component {
     return (
       <div className="App container-fluid">
         <nav className="navbar navbar-dark App-header fixed-top">
-          <span className="navbar-brand mb-0 h1">Twitter Study</span>
+          <span className="navbar-brand mb-0 h1">Twitter Study Testing Updates!!!</span>
           {auth}
         </nav>
 
