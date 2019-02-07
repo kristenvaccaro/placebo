@@ -23,7 +23,7 @@ export default class TweetView extends Component {
       media = (
         <img
           className="img-fluid rounded w-50"
-          width={tweet.entities.media[0].sizes.thumb.w * 5}
+          width={tweet.entities.media[0].sizes.thumb.w * 4}
           src={tweet.entities.media[0].media_url}
           alt="tweet img"
         />
