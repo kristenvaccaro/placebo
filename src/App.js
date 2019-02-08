@@ -21,8 +21,10 @@ var shuffle = require("shuffle-array");
    YR    = yes control, random = random
 */
 const OPTIONS = ["N", "NR", "YPOP", "YPOPR", "YR"];
-var CONTROL = true;
-var RANDOM = false;
+var CONTROL;
+var RANDOM;
+// var CONTROL = true;
+// var RANDOM = false;
 
 const TWEET_DISPLAY_RANGE = 20;
 
@@ -90,8 +92,37 @@ class App extends Component {
   }
 
   setup = () => {
-    CONTROL = Math.floor(Math.random() * 2);
-    RANDOM = Math.floor(Math.random() * 2);
+    // CONTROL = Math.floor(Math.random() * 2);
+    // RANDOM = Math.floor(Math.random() * 2);
+    const OPTIONS = ["N", "NR", "YPOP", "YPOPR", "YR"];
+    CONTROL = OPTIONS[Math.floor(Math.random() * OPTIONS.length)];
+    switch(CONTROL) {
+      case "N":
+        var CONTROL = false;
+        var RANDOM = false;
+        var LABEL = "N/A";
+        break;
+      case "NR":
+        var CONTROL = false;
+        var RANDOM = true;
+        var LABEL = "N/A";
+        break;
+      case "YPOP":
+        var CONTROL = true;
+        var RANDOM = false;
+        var LABEL = "POPULARITY";
+        break;
+      case "YPOPR":
+        var CONTROL = true;
+        var RANDOM = true;
+        var LABEL = "POPULARITY";
+        break;
+      case "YR":
+        var CONTROL = false;
+        var RANDOM = false;
+        var LABEL = "RANDOM";
+        break;
+    }
   };
 
   onSliderChange(value) {
